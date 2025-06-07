@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Movie Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    header {
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      text-align: center;
+    }
+    nav button {
+      margin: 5px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .search {
+      margin: 20px 0;
+    }
+    form input, form textarea, form select {
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+      padding: 8px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Movie Tracker</h1>
+    <nav>
+      <button onclick="filterSection('Movies')">Movies</button>
+      <button onclick="filterSection('Series')">Series</button>
+      <button onclick="filterSection('Cartoons')">Cartoons</button>
+    </nav>
+  </header>
+
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Search by title..." oninput="searchMovies()" />
+  </div>
+
+  <form id="entryForm" onsubmit="addEntry(event)">
+    <select id="section">
+      <option>Movies</option>
+      <option>Series</option>
+      <option>Cartoons</option>
+    </select>
+    <input type="text" id="title" placeholder="Title" required />
+    <textarea id="description" placeholder="Description" required></textarea>
+    <input type="number" id="rating" placeholder="Rating (1-10)" min="1" max="10" required />
+    <input type="text" id="subcategory" placeholder="Subcategory (e.g. Action)" required />
+    <input type="url" id="imageUrl" placeholder="Image URL (link to poster)" required />
+    <button type="submit">Add Entry</button>
+  </form>
+
+  <div id="gallery" class="gallery"></div>
+
+  <script>
+    let entries = [];
+
+    function addEntry(event) {
+      event.preventDefault();
+      const section = document.getElementById('section').value;
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const rating = document.getElementById('rating').value;
+      const subcategory = document.getElementById('subcategory').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+
+      entries.push({ section, title, description, rating, subcategory, imageUrl });
+      renderEntries();
+      document.getElementById('entryForm').reset();
+    }
+
+    function renderEntries(filter = '') {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+
+      entries
+        .filter(entry => entry.title.toLowerCase().includes(filter.toLowerCase()))
+        .filter(entry => !currentFilter || entry.section === currentFilter)
+        .forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${entry.imageUrl}" alt="${entry.title}" />
+            <h3>${entry.title}</h3>
+            <p>${entry.description}</p>
+            <p><strong>Rating:</strong> ${entry.rating}/10</p>
+            <p><strong>Category:</strong> ${entry.section} - ${entry.subcategory}</p>
+          `;
+          gallery.appendChild(card);
+        });
+    }
+
+    let currentFilter = '';
+    function filterSection(section) {
+      currentFilter = section;
+      renderEntries(document.getElementById('searchInput').value);
+    }
+
+    function searchMovies() {
+      renderEntries(document.getElementById('searchInput').value);
+    }
+  </script>
+</body>
+</html>
