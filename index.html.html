@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Movie Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      padding: 20px;
+    }
+    header {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+    nav {
+      margin-top: 10px;
+    }
+    nav button {
+      background-color: #2a2a2a;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background-color: #3b3b3b;
+    }
+    .search input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      border: none;
+      background: #1c1c1c;
+      color: white;
+      font-size: 16px;
+    }
+    form {
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    form input, form textarea, form select {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: #2a2a2a;
+      color: white;
+    }
+    form button {
+      background-color: #e50914;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    form button:hover {
+      background-color: #b20710;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.02);
+    }
+    .card img {
+      width: 100%;
+      height: 360px;
+      object-fit: cover;
+    }
+    .card h3 {
+      font-size: 18px;
+      margin: 15px;
+    }
+    .card p {
+      font-size: 14px;
+      margin: 0 15px 10px;
+      color: #ccc;
+    }
+    .card p strong {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>My Movie Hub</h1>
+    <nav>
+      <button onclick="filterSection('Movies')">Movies</button>
+      <button onclick="filterSection('Series')">Series</button>
+      <button onclick="filterSection('Cartoons')">Cartoons</button>
+    </nav>
+  </header>
+
+  <div class="search">
+    <input type="text" id="searchInput" placeholder="Search by title..." oninput="searchMovies()" />
+  </div>
+
+  <form id="entryForm" onsubmit="addEntry(event)">
+    <select id="section">
+      <option>Movies</option>
+      <option>Series</option>
+      <option>Cartoons</option>
+    </select>
+    <input type="text" id="title" placeholder="Title" required />
+    <textarea id="description" placeholder="Description" required></textarea>
+    <input type="number" id="rating" placeholder="Rating (1-10)" min="1" max="10" required />
+    <input type="text" id="subcategory" placeholder="Subcategory (e.g. Action)" required />
+    <input type="url" id="imageUrl" placeholder="Image URL (link to poster)" required />
+    <button type="submit">Add Entry</button>
+  </form>
+
+  <div id="gallery" class="gallery"></div>
+
+  <script>
+    let entries = [];
+
+    function addEntry(event) {
+      event.preventDefault();
+      const section = document.getElementById('section').value;
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const rating = document.getElementById('rating').value;
+      const subcategory = document.getElementById('subcategory').value;
+      const imageUrl = document.getElementById('imageUrl').value;
+
+      entries.push({ section, title, description, rating, subcategory, imageUrl });
+      renderEntries();
+      document.getElementById('entryForm').reset();
+    }
+
+    function renderEntries(filter = '') {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+
+      entries
+        .filter(entry => entry.title.toLowerCase().includes(filter.toLowerCase()))
+        .filter(entry => !currentFilter || entry.section === currentFilter)
+        .forEach(entry => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${entry.imageUrl}" alt="${entry.title}" />
+            <h3>${entry.title}</h3>
+            <p>${entry.description}</p>
+            <p><strong>Rating:</strong> ${entry.rating}/10</p>
+            <p><strong>Category:</strong> ${entry.section} - ${entry.subcategory}</p>
+          `;
+          gallery.appendChild(card);
+        });
+    }
+
+    let currentFilter = '';
+    function filterSection(section) {
+      currentFilter = section;
+      renderEntries(document.getElementById('searchInput').value);
+    }
+
+    function searchMovies() {
+      renderEntries(document.getElementById('searchInput').value);
+    }
+  </script>
+</body>
+</html>
